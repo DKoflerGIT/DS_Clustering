@@ -23,7 +23,7 @@ def AssignClusters(E, k):
     # Choose random datapoints as starting cluster centers
     C = selectRandomCenters(k)
 
-    def argminDistance(e): # calculates closest cluster for a given datapoint
+    def argminDistance(e): # returns index of closest cluster for a given datapoint
         minDist = 100
 
         for c in C:
@@ -36,13 +36,13 @@ def AssignClusters(E, k):
 
     # Find closest cluster for each datapoint
     for e in E:
-        L[e] = argminDistance(e)
+        L[e] = C[argminDistance(e)]
 
     def UpdateCluster(c): # moves given cluster to mean position of its current corresponding datapoints
         pts = []
 
         for l in L:
-            if (C[L[l]]) == c:
+            if L[l] == c:
                 pts.append(l)
 
         sumX = 0
@@ -72,8 +72,8 @@ def AssignClusters(E, k):
         for e in E:
             minDist = euclidean_distance(e,C[argminDistance(e)])
 
-            if minDist != euclidean_distance(e,C[L[e]]):
-                L[e] = argminDistance(e)
+            if minDist != euclidean_distance(e,L[e]):
+                L[e] = C[argminDistance(e)]
                 changed = True
 
         iter += 1
@@ -81,4 +81,4 @@ def AssignClusters(E, k):
         if not changed or iter > maxIters:
             break
     
-    return L, C
+    return L

@@ -23,11 +23,12 @@ def AssignClusters(E, k):
     # Choose random datapoints as starting cluster centers
     C = selectRandomCenters(k)
 
-    def argminDistance(e): # returns index of closest cluster for a given datapoint
-        minDist = 100
+    def argminDistance(dataPoint): # returns index of closest cluster for a given datapoint
+        minDistCenter = C[0]
+        minDist = euclidean_distance(dataPoint,minDistCenter)
 
         for c in C:
-            dist = euclidean_distance(e,c)
+            dist = euclidean_distance(dataPoint,c)
             if dist < minDist:
                 minDist = dist
                 minDistCenter = c

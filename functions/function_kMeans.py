@@ -1,21 +1,27 @@
-def AssignClusters(E, k):
+# Verson 1.4
+# D. Kofler 2021
+# Now works for n-dimensional datapoints
+
+def AssignClusters(E, k = 1):
     import random
     import math
 
     C = []
     L = {}
 
-    def euclidean_distance(data_point_a, data_point_b): #calculates euclidean distance
-        x_a = data_point_a[0]
-        y_a = data_point_a[1]
-        z_a = data_point_a[2]
-        x_b = data_point_b[0]
-        y_b = data_point_b[1]
-        z_b = data_point_b[2]
+    dim = len(E[0]) #dimensionality of the data points
+
+    def euclidean_distance(dataPoint1, dataPoint2): #calculates euclidean distance
+        pts = []
         
-        eucl_dist = round(math.sqrt((x_a - x_b) ** 2 + (y_a - y_b) ** 2 + (z_a - z_b) ** 2),2)
-        
-        return eucl_dist
+        for d in range(dim):
+            pts.append((dataPoint1[d],dataPoint2[d]))
+
+        sumSquares = 0
+        for i,p in enumerate(pts):
+            sumSquares += (p[1] - p[0]) ** 2
+
+        return round(math.sqrt(sumSquares),2)
 
     def selectRandomCenters(k): # returns k random data points from all data points E
         return random.sample(E, k)
@@ -46,17 +52,17 @@ def AssignClusters(E, k):
             if L[l] == c:
                 pts.append(l)
 
-        sumX = 0
-        sumY = 0
-        sumZ = 0
+        sums = []
+        newPosList = []
 
-        for x,y,z in pts:
-            sumX += x
-            sumY += y
-            sumZ += z
-        
-        newPos = (round(sumX/len(pts),0),round(sumY/len(pts),0),round(sumZ/len(pts),0))
-        return newPos
+        for d in range(dim):
+            sums.append(0)
+            
+            for p in pts:
+                sums[d] += p[d]
+            newPosList.append(round(sums[d] / len(pts),2))
+
+        return tuple(newPosList)
 
     # optimize cluster-positions
     iter = 0

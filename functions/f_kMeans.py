@@ -43,13 +43,13 @@ def AssignClusters(E, k = 1):
 
     # Find closest cluster for each datapoint
     for e in E:
-        L[e] = C[argminDistance(e)]
+        L[e] = argminDistance(e)
 
     def UpdateCluster(c): # moves given cluster to mean position of its current corresponding datapoints
         pts = []
 
         for l in L:
-            if L[l] == c:
+            if C[L[l]] == c:
                 pts.append(l)
 
         sums = []
@@ -60,7 +60,7 @@ def AssignClusters(E, k = 1):
             
             for p in pts:
                 sums[d] += p[d]
-            newPosList.append(round(sums[d] / len(pts),2))
+            newPosList.append(round(sums[d] / len(pts), 2))
 
         return tuple(newPosList)
 
@@ -79,8 +79,8 @@ def AssignClusters(E, k = 1):
         for e in E:
             minDist = euclidean_distance(e,C[argminDistance(e)])
 
-            if minDist != euclidean_distance(e,L[e]):
-                L[e] = C[argminDistance(e)]
+            if minDist != euclidean_distance(e,C[L[e]]):
+                L[e] = argminDistance(e)
                 changed = True
 
         iter += 1
@@ -88,4 +88,8 @@ def AssignClusters(E, k = 1):
         if not changed or iter > maxIters:
             break
     
-    return L
+    ResDict = {}
+    for l in L:
+        ResDict[l] = C[L[l]]
+
+    return ResDict

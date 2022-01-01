@@ -43,8 +43,54 @@ def AssignClusters(dataPoints, clusterAmount, optimize): # assigns datapoints to
     def selectRandomCenters(k): # returns k random data points from all data points E
         return random.sample(E, k)
 
-    # Choose random datapoints as starting cluster centers
-    C = selectRandomCenters(k)
+    def selectInitialCenters(k): # returns k data points as initial cluster centers based on kMeans++ 
+        initialClusters = []
+        weights = []
+        initialClusters.append(random.choice(E)) # add random datapoint as first inital cluster center
+        i = 1
+        
+        while i < k:
+            i = i + 1
+            weights.clear()
+            
+            # Sum of all D(X)^2
+            sumDx2 = 0
+            for e in E: 
+                e_minDist = euclideanDistance(e, initialClusters[0])
+
+                # find distance to closest cluster center
+                for c in initialClusters:
+                    e_dist = euclideanDistance(e, c)
+
+                    if e_dist < e_minDist:
+                        e_minDist = e_dist
+                
+                # add minDist^2 to sum of all minDist^2
+                sumDx2 += e_minDist ** 2
+
+            # D(X)^2 for current point
+            for e in E:    
+                Dx2 = 0
+                e_minDist = euclideanDistance(e, initialClusters[0])
+
+                # find distance to closest cluster center
+                for c in initialClusters: 
+                    e_dist = euclideanDistance(e, c)
+
+                    if e_dist < e_minDist:
+                        e_minDist = e_dist
+                
+                Dx2 = e_minDist ** 2
+
+                weights.append(round(Dx2 / sumDx2, 4))
+            
+            print(weights)
+            initialClusters.append(random.choices(E, weights = weights, k = 1)[0])
+
+        return initialClusters
+
+    # Choose datapoints as starting cluster centers
+    C = selectInitialCenters(k)
 
     def argminDistance(dataPoint): # returns index of closest cluster for a given datapoint
         minDistCenter = C[0]
@@ -202,6 +248,7 @@ def plotClusters(assignmentDict): # creates 2D or 3D plots of clusters and their
                 plt.scatter(dataPointsPlot[0], s = 30, c = dataPointsPlot[c], marker = 'o')
             case 2:
                 plt.scatter(c[0], c[1], s = 200, c = clusterColors[c], marker = 'x')
+                plt.annotate(str(i), c, (c[0], c[1] - 2))
                 plt.scatter(dataPointsPlot[0], dataPointsPlot[1], s = 30, c = clusterColors[c], marker = 'o')
                 plt.xlabel('x')
                 plt.ylabel('y')
@@ -214,5 +261,8 @@ def plotClusters(assignmentDict): # creates 2D or 3D plots of clusters and their
                 ax.set_ylabel('y')
                 ax.set_zlabel('z')
                 plt.title('3D k-Means-clustering')
+    
+    for i, d in enumerate(dataPoints):
+        plt.annotate(str(i), d)
 
     plt.show()

@@ -1,7 +1,7 @@
-import os, random, numpy as np
-from functions import f_kMeans as km, f_createRandomDatapoints as crd, f_clusterPlot as plt
+from functions import kMeans as km
 
 dpts = []
-dpts = crd.createDatapoints(500, 2) #currently 2+ work with kMeans, 2&3 with plot
-kmeans = km.AssignClusters(dpts,2)
-plt.plot(kmeans, 'k-Means clustering')
+dpts = km.createRandomDatapoints(500, 2) #kMeans works for 2+ dimensions, for 1 dimension not always. plot works for 2 or 3 dimensions
+#clusterAmount = km.findOptimalClusterAmount(dpts)
+kmeans = km.AssignClusters(dpts, 5, False)
+km.plotClusters(kmeans)

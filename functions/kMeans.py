@@ -225,7 +225,7 @@ def findOptimalClusterAmount(E): # finds the optimal amount of clusters using th
     return optimalClusterAmount
 
 
-def plotClusters(assignmentDict): # creates 2D or 3D plots of clusters and their assigned datapoints
+def plotClusters(assignmentDict, annotations): # creates 2D or 3D plots of clusters and their assigned datapoints
     dataPoints = []
     clusterCenters = []
 
@@ -273,11 +273,18 @@ def plotClusters(assignmentDict): # creates 2D or 3D plots of clusters and their
                 plt.scatter(dataPointsPlot[0], s = 30, c = dataPointsPlot[c], marker = 'o')
 
             case 2:
+                if annotations:
+                    s1 = 500
+                    s2 = 200
+                else:
+                    s1 = 200
+                    s2 = 50
+
                 #cluster-centers
-                plt.scatter(c[0], c[1], s = 500, c = clusterColors[c], marker = 'o')
+                plt.scatter(c[0], c[1], s = s1, c = clusterColors[c], marker = 'o') #s = 200 when using annotations
 
                 #data-points
-                plt.scatter(dataPointsPlot[0], dataPointsPlot[1], s = 200, c = 'w', edgecolors = clusterColors[c], marker = 'o')
+                plt.scatter(dataPointsPlot[0], dataPointsPlot[1], s = s2, c = 'w', edgecolors = clusterColors[c], marker = 'o') #s = 200 when using annotations
 
                 plt.xlabel('x')
                 plt.ylabel('y')
@@ -293,10 +300,11 @@ def plotClusters(assignmentDict): # creates 2D or 3D plots of clusters and their
 
                 plt.title('3D k-Means-clustering')
     
-    for i, d in enumerate(dataPoints):
-        plt.annotate(i, d, (d[0] - 0.8, d[1] - 0.6))
+    if annotations:
+        for i, d in enumerate(dataPoints):
+            plt.annotate(i, d, (d[0] - 0.8, d[1] - 0.6))
 
-    for i, c in enumerate(clusterCenters):
-        plt.annotate(i, c, (c[0] - 0.5, c[1] - 3))
+        for i, c in enumerate(clusterCenters):
+            plt.annotate(i, c, (c[0] - 0.5, c[1] - 0.5))
 
     plt.show()

@@ -46,12 +46,24 @@ def AssignClusters(dataPoints, clusterAmount, optimize): # assigns datapoints to
     def selectInitialCenters(k): # returns k data points as initial cluster centers based on kMeans++ 
         initialClusters = []
         weights = []
+        weightsp = []
         initialClusters.append(random.choice(E)) # add random datapoint as first inital cluster center
-        i = 1
+
+        # print('initial cluster ' +
+        #     str(E.index(initialClusters[0])) +
+        #     ' at (' +
+        #     str(initialClusters[0][0]) +
+        #     ',' +
+        #     str(initialClusters[0][1]) +
+        #     ')'
+        # )
+
+        iter = 1
         
-        while i < k:
-            i = i + 1
+        while iter < k:
+            iter = iter + 1
             weights.clear()
+            weightsp.clear()
             
             # Sum of all D(X)^2
             sumDx2 = 0
@@ -81,11 +93,24 @@ def AssignClusters(dataPoints, clusterAmount, optimize): # assigns datapoints to
                         e_minDist = e_dist
                 
                 Dx2 = e_minDist ** 2
-
-                weights.append(round(Dx2 / sumDx2, 4))
+                w = round(Dx2 / sumDx2, 4)
+                weights.append(w)
+                weightsp.append((round(w * 100, 2), int(Dx2)))
             
-            print(weights)
-            initialClusters.append(random.choices(E, weights = weights, k = 1)[0])
+            # for i, w in enumerate(weightsp):
+            #     print(str(i) + ' - ' + str(w[0]) + ' - d: ' + str(w[1]))
+            ic = random.choices(E, weights = weights, k = 1)[0]
+            # print('chose cluster ' +
+            #     str(E.index(ic)) +
+            #     ' at (' +
+            #     str(ic[0]) +
+            #     ',' +
+            #     str(ic[1]) +
+            #     ') with probabiltiy ' +
+            #     str(weightsp[E.index(ic)][0]) +
+            #     ' %'
+            # )
+            initialClusters.append(ic)
 
         return initialClusters
 
@@ -246,10 +271,14 @@ def plotClusters(assignmentDict): # creates 2D or 3D plots of clusters and their
             case 1: ##not working yet
                 plt.scatter(c[0], s = 200, c = clusterColors[c], marker = 'x')
                 plt.scatter(dataPointsPlot[0], s = 30, c = dataPointsPlot[c], marker = 'o')
+
             case 2:
-                plt.scatter(c[0], c[1], s = 200, c = clusterColors[c], marker = 'x')
-                plt.annotate(str(i), c, (c[0], c[1] - 2))
-                plt.scatter(dataPointsPlot[0], dataPointsPlot[1], s = 30, c = clusterColors[c], marker = 'o')
+                #cluster-centers
+                plt.scatter(c[0], c[1], s = 500, c = clusterColors[c], marker = 'o')
+
+                #data-points
+                plt.scatter(dataPointsPlot[0], dataPointsPlot[1], s = 200, c = 'w', edgecolors = clusterColors[c], marker = 'o')
+
                 plt.xlabel('x')
                 plt.ylabel('y')
                 plt.title('2D k-Means-clustering')
@@ -257,12 +286,17 @@ def plotClusters(assignmentDict): # creates 2D or 3D plots of clusters and their
             case 3:
                 ax.scatter(c[0], c[1], c[2], s = 200, c = clusterColors[c], marker = 'x', alpha = 1, depthshade = False)
                 ax.scatter(dataPointsPlot[0], dataPointsPlot[1], dataPointsPlot[2], s = 30, c = clusterColors[c], marker = 'o', alpha = 1, depthshade = False)
+
                 ax.set_xlabel('x')
                 ax.set_ylabel('y')
                 ax.set_zlabel('z')
+
                 plt.title('3D k-Means-clustering')
     
     for i, d in enumerate(dataPoints):
-        plt.annotate(str(i), d)
+        plt.annotate(i, d, (d[0] - 0.8, d[1] - 0.6))
+
+    for i, c in enumerate(clusterCenters):
+        plt.annotate(i, c, (c[0] - 0.5, c[1] - 3))
 
     plt.show()

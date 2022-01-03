@@ -32,7 +32,7 @@ def euclideanDistance(dataPoint1, dataPoint2): # calculates euclidean distance
     return round(math.sqrt(sumSquares),2)
 
 
-def AssignClusters(dataPoints, clusterAmount, optimize): # assigns datapoints to clusters using a k-Means algorithm
+def AssignClusters(dataPoints, clusterAmount, optimize = True, initialClusterMethod = 'k'): # assigns datapoints to clusters using a k-Means algorithm
     C = []
     L = {}
     E = dataPoints
@@ -115,7 +115,10 @@ def AssignClusters(dataPoints, clusterAmount, optimize): # assigns datapoints to
         return initialClusters
 
     # Choose datapoints as starting cluster centers
-    C = selectInitialCenters(k)
+    if initialClusterMethod == 'r':
+        C = selectRandomCenters(k)
+    else:
+        C = selectInitialCenters(k)
 
     def argminDistance(dataPoint): # returns index of closest cluster for a given datapoint
         minDistCenter = C[0]
@@ -187,18 +190,24 @@ def AssignClusters(dataPoints, clusterAmount, optimize): # assigns datapoints to
     return ResDict
 
 
+def withinClusterSumSquares(A): # calculates WCSS-value
+    wcss = 0
+    dataPoints = [a for a in A]
+
+    for d in dataPoints:
+        wcss += int(euclideanDistance(d, A[d]) ** 2)
+
+    return wcss
+
+
 def findOptimalClusterAmount(E): # finds the optimal amount of clusters using the WCSS-method
     
-    assinments = {}
+    assignments = {}
     wcssDict = {}
     for i in range(2, 11): #try with up to 10 clusters
-        assinments.clear()
-        assinments = AssignClusters(E, i, True)
-
-        wcss = 0
-        for e in E:
-            wcss += int(euclideanDistance(e, assinments[e]) ** 2)
-
+        assignments.clear()
+        assignments = AssignClusters(E, i, True)
+        wcss = withinClusterSumSquares(assignments)
         wcssDict[i] = wcss
 
         if i == 2:
@@ -281,10 +290,10 @@ def plotClusters(assignmentDict, annotations): # creates 2D or 3D plots of clust
                     s2 = 50
 
                 #cluster-centers
-                plt.scatter(c[0], c[1], s = s1, c = clusterColors[c], marker = 'o') #s = 200 when using annotations
+                plt.scatter(c[0], c[1], s = s1, c = clusterColors[c], marker = 'o', label = f'Cluster-Center {i}') #s = 200 when using annotations
 
                 #data-points
-                plt.scatter(dataPointsPlot[0], dataPointsPlot[1], s = s2, c = 'w', edgecolors = clusterColors[c], marker = 'o') #s = 200 when using annotations
+                plt.scatter(dataPointsPlot[0], dataPointsPlot[1], s = s2, c = 'w', edgecolors = clusterColors[c], marker = 'o', label = 'Data-Point') #s = 200 when using annotations
 
                 plt.xlabel('x')
                 plt.ylabel('y')
@@ -307,4 +316,5 @@ def plotClusters(assignmentDict, annotations): # creates 2D or 3D plots of clust
         for i, c in enumerate(clusterCenters):
             plt.annotate(i, c, (c[0] - 0.5, c[1] - 0.5))
 
+    #plt.legend()
     plt.show()

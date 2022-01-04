@@ -1,2 +1,2 @@
 # DataScience
-private repository to test data analysis in python
+building my own Data Science library, currently includes kMeans++ clustering, cluster-plotting, wcss cluster evaluation
